@@ -4,7 +4,6 @@ require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 8000;
 
-
 app.use(cors())
 app.use(express.json())
 
@@ -25,16 +24,33 @@ async function server() {
     const tutorsCollection = db.collection("tutors");
 
     app.get("/tutors", async (req, res) => {
-        const cursor = tutorsCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
+        try {
+            const limit = parseInt(req.query.limit); 
+            
+            let cursor = tutorsCollection.find();
+            
+            if (limit) {
+                cursor = cursor.limit(limit);
+            }
+            
+            const result = await cursor.toArray();
+            res.send(result);
+        } catch (error) {
+            console.error("Error fetching tutors:", error);
+            res.status(500).send({ error: "Failed to fetch tutors data" });
+        }
     });
 
     app.get("/tutors/:tutorId", async (req, res) => {
-        const tutorId = req.params.tutorId;
-        const query = { _id: new ObjectId(tutorId) };
-        const result = await tutorsCollection.findOne(query);
-        res.send(result);
+        try {
+            const tutorId = req.params.tutorId;
+            const query = { _id: new ObjectId(tutorId) };
+            const result = await tutorsCollection.findOne(query);
+            res.send(result);
+        } catch (error) {
+            console.error("Error fetching single tutor:", error);
+            res.status(500).send({ error: "Invalid Tutor ID or Server Error" });
+        }
     });
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
