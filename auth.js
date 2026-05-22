@@ -1,4 +1,3 @@
-// basic-crud-server/auth.js
 const { betterAuth } = require("better-auth");
 const { mongodbAdapter } = require("better-auth/adapters/mongodb");
 
