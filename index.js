@@ -196,6 +196,21 @@ app.patch("/bookings/:id", async (req, res) => {
     }
 });
 
+
+const jwt = require('jsonwebtoken'); 
+
+
+app.post("/jwt", async (req, res) => {
+    const user = req.body;
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    }).send({ success: true });
+});
+
         const auth = initAuth(client);
         app.use("/api/auth", (req, res, next) => {
             toNodeHandler(auth)(req, res, next);
